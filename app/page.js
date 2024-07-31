@@ -1,6 +1,9 @@
 'use client'
 
-import {Box, Stack, Typography, Button, Modal, TextField} from '@mui/material'
+import './globals.css'
+import Navbar from './Components/Navbar'
+import { Box, Stack, Typography, Button, Modal, TextField, InputAdornment } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
 import { firestore } from '@/firebase'
 import { collection, doc, getDocs, query, setDoc, deleteDoc, getDoc } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
@@ -53,7 +56,7 @@ export default function Home() {
     const docs = await getDocs(snapshot)
     const pantryList = []
     docs.forEach((doc) => {
-      pantryList.push({"name": doc.id, ...doc.data()})
+      pantryList.push({ "name": doc.id, ...doc.data() })
     })
     console.log(pantryList)
     setPantry(pantryList)
@@ -70,10 +73,10 @@ export default function Home() {
     // Check if item exists
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
-      const {count} = docSnap.data()
-      await setDoc(docRef, {count: count + quantity})
+      const { count } = docSnap.data()
+      await setDoc(docRef, { count: count + quantity })
     } else {
-      await setDoc(docRef, {count: quantity})
+      await setDoc(docRef, { count: quantity })
     }
     await updatePantry()
   }
@@ -105,165 +108,181 @@ export default function Home() {
     handleCloseRemove()
   }
 
-  const filteredPantry = pantry.filter(({name}) => 
+  const filteredPantry = pantry.filter(({ name }) =>
     name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  return <Box
-    width="100vw"
-    height="100vh"
-    display={'flex'}
-    justifyContent={'center'}
-    flexDirection={'column'}
-    alignItems={'center'}
-    gap={2}
-  >
-    <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+  return (
+    <>
+      <Navbar />
+      <Box
+        width="100vw"
+        height="100vh"
+        display={'flex'}
+        justifyContent={'center'}
+        flexDirection={'column'}
+        alignItems={'center'}
+        gap={2}
+        bgcolor="linear-gradient(to right, #ff758c, #ff7eb3)"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add Item
-          </Typography>
-          <Stack width="100%" direction={'column'} spacing={2}>
-            <TextField id="outlined-basic" label="Item" variant="outlined" fullWidth value={itemName} onChange={(e) => setItemName(e.target.value)}/>
-            <TextField 
-              id="outlined-basic" 
-              label="Quantity" 
-              type="number" 
-              variant="outlined" 
-              fullWidth 
-              value={itemQuantity} 
-              onChange={(e) => {
-                const value = parseInt(e.target.value)
-                setItemQuantity(value < 0 ? 0 : value)
-              }}
-            />
-            <Button variant="outlined"
-            onClick={() => {
-              addItem(itemName, itemQuantity)
-              setItemName('')
-              setItemQuantity(1)
-              handleClose()
-            }}
-            >
-              Add
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    <Modal
-        open={openEdit}
-        onClose={handleCloseEdit}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Edit Item
-          </Typography>
-          <Stack width="100%" direction={'column'} spacing={2}>
-            <TextField id="outlined-basic" label="Item" variant="outlined" fullWidth value={editItemName} onChange={(e) => setEditItemName(e.target.value)}/>
-            <TextField 
-              id="outlined-basic" 
-              label="Quantity" 
-              type="number" 
-              variant="outlined" 
-              fullWidth 
-              value={editItemQuantity} 
-              onChange={(e) => {
-                const value = parseInt(e.target.value)
-                setEditItemQuantity(value < 0 ? 0 : value)
-              }}
-            />
-            <Button variant="outlined"
-            onClick={() => {
-              editItem(itemToEdit, editItemName, editItemQuantity)
-              setEditItemName('')
-              setEditItemQuantity(1)
-              handleCloseEdit()
-            }}
-            >
-              Save
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    <Modal
-        open={openRemove}
-        onClose={handleCloseRemove}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Confirm Remove
-          </Typography>
-          <Typography id="modal-modal-description">
-            Are you sure you want to remove this item?
-          </Typography>
-          <Stack width="100%" direction={'row'} spacing={2} justifyContent={'flex-end'}>
-            <Button variant="outlined" onClick={() => removeItem(itemToRemove.name)}>
-              Yes
-            </Button>
-            <Button variant="outlined" onClick={handleCloseRemove}>
-              No
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-    <Button variant="contained" onClick={handleOpen}>Add</Button>
-    <Box border={'1px solid #333'}>
-      <Box width="800px" height="100px" bgcolor={'#ADD8E6'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
-        <Typography variant={'h2'} color={'#333'} textAlign={'center'}>
-          Pantry Items
-        </Typography >
-      </Box>
-      <Box px={2} py={1}>
-      <TextField 
-          id="search-bar" 
-          label="Search items in inventory..." 
-          variant="outlined" 
-          fullWidth 
-          value={searchQuery} 
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </Box>
-      <Stack width ="800px" height="500px" spacing={2} overflow={'auto'}>
-        {filteredPantry.map((item) => (
-            <Box
-              key={item.name}
-              width="100%"
-              minHeight="150px"
-              display={'flex'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
-              bgcolor={'#f0f0f0'}
-              paddingX={5}
-            >
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
-                {
-                  // Capitalize the first letter of the item
-                  item.name.charAt(0).toUpperCase() + item.name.slice(1)
-                }
-              </Typography>
-
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
-                Quantity: {item.count}
-              </Typography>
-            
-            <Button variant="contained" onClick={() => handleOpenEdit(item)}>
-              Edit
-            </Button>
-            <Button variant="contained" onClick={() => handleOpenRemove(item)}>
-              Remove
-            </Button>
+        <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Add Item
+            </Typography>
+            <Stack width="100%" direction={'column'} spacing={2}>
+              <TextField id="outlined-basic" label="Item" variant="outlined" fullWidth value={itemName} onChange={(e) => setItemName(e.target.value)} />
+              <TextField
+                id="outlined-basic"
+                label="Quantity"
+                type="number"
+                variant="outlined"
+                fullWidth
+                value={itemQuantity}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  setItemQuantity(value < 0 ? 0 : value);
+                }}
+              />
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  addItem(itemName, itemQuantity);
+                  setItemName('');
+                  setItemQuantity(1);
+                  handleClose();
+                }}
+              >
+                Add
+              </Button>
+            </Stack>
           </Box>
-        ))}
-      </Stack>
-    </Box>
-  </Box>
+        </Modal>
+        <Modal open={openEdit} onClose={handleCloseEdit} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Edit Item
+            </Typography>
+            <Stack width="100%" direction={'column'} spacing={2}>
+              <TextField id="outlined-basic" label="Item" variant="outlined" fullWidth value={editItemName} onChange={(e) => setEditItemName(e.target.value)} />
+              <TextField
+                id="outlined-basic"
+                label="Quantity"
+                type="number"
+                variant="outlined"
+                fullWidth
+                value={editItemQuantity}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  setEditItemQuantity(value < 0 ? 0 : value);
+                }}
+              />
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  editItem(itemToEdit, editItemName, editItemQuantity);
+                  setEditItemName('');
+                  setEditItemQuantity(1);
+                  handleCloseEdit();
+                }}
+              >
+                Save
+              </Button>
+            </Stack>
+          </Box>
+        </Modal>
+        <Modal open={openRemove} onClose={handleCloseRemove} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Confirm Remove
+            </Typography>
+            <Typography id="modal-modal-description">Are you sure you want to remove this item?</Typography>
+            <Stack width="100%" direction={'row'} spacing={2} justifyContent={'flex-end'}>
+              <Button variant="outlined" onClick={() => removeItem(itemToRemove.name)}>
+                Yes
+              </Button>
+              <Button variant="outlined" onClick={handleCloseRemove}>
+                No
+              </Button>
+            </Stack>
+          </Box>
+        </Modal>
+        <Box width="800px" height="50px" display={'flex'} justifyContent={'center'} alignItems={'center'} paddingTop={12} paddingBottom={5}>
+          <Typography variant={'h3'} color={'#fff'} textAlign={'center'}>
+          <span style={{ fontWeight: 'bold' }}>Name's</span> Your<span style={{ fontWeight: 'bold' }}>Pantry</span>
+          </Typography>
+        </Box>
+        <Box display={'flex'} alignItems={'center'} gap={1} width="800px" mb={3}>
+          <Box width="83%" display={'flex'} alignItems={'center'} bgcolor={'#fff'} borderRadius={'50px'} boxShadow={'0px 8px 10px rgba(0, 0, 0, 0.3)'}>
+            <TextField
+              id="search-bar"
+              placeholder="Search items in inventory..."
+              variant="outlined"
+              fullWidth
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                sx: {
+                  borderRadius: '50px',
+                  fontFamily: 'Poppins',
+                  border: 'none',
+                  '& fieldset': { border: 'none' },
+                }
+              }}
+            />
+          </Box>
+          <Button
+            variant="contained"
+            onClick={handleOpen}
+            sx={{
+              borderRadius: '50px',
+              backgroundColor: 'transparent',
+              border: '2px solid white',
+              padding: '14px 28px',
+              boxShadow: '0px 8px 10px rgba(0, 0, 0, 0.3)',
+              textTransform: 'none', 
+              fontSize: '14px',
+              fontFamily: 'Poppins',
+              '&:hover': {backgroundColor: 'transparent'}
+            }}
+          >
+            Add Item
+          </Button>
+        </Box>
+        <Box borderRadius={'15px'} boxShadow={'0px 4px 6px rgba(0, 0, 0, 0.1)'} width="1150px" height="500px" bgcolor={'#fff'} overflow={'hidden'} py={2} px={3}>
+        <Box display={'flex'} paddingBottom={1} position="sticky" top={0} bgcolor={'#fff'} zIndex={1}>
+            <Typography fontWeight={'bold'} fontFamily='Poppins' px={5}>Name</Typography>
+            <Typography fontWeight={'bold'} fontFamily= 'Poppins' px={27}>Quantity</Typography>
+          </Box>
+          <Stack spacing={1} overflow={'auto'} sx={{ height: '100%' }}>
+            {filteredPantry.map((item) => (
+              <Box key={item.name} width="100%" minHeight="50px" display={'flex'} justifyContent={'space-between'} alignItems={'center'} bgcolor={'#f0f0f0'} paddingX={5} borderRadius={'10px'} boxShadow={'0px 2px 4px rgba(0, 0, 0, 0.1)'}>
+                <Typography variant={'h7'} color={'#333'} textAlign={'left'} width="20%">
+                  {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                </Typography>
+
+                <Typography variant={'h7'} color={'#333'} textAlign={'center'} width="120%">
+                  {item.count}
+                </Typography>
+
+                <Box display={'flex'} justifyContent={'space-between'} width="100%">
+                  <Button variant="contained" onClick={() => handleOpenEdit(item)} sx={{ borderRadius: '10px', backgroundColor: 'transparent', padding: '3px 30px', border: '2px solid #FF939B', color: '#FF939B', boxShadow:'0px 4px 6px rgba(0, 0, 0, 0.0)', textTransform: 'none', fontSize: '16px', fontFamily: 'Poppins', '&:hover': {backgroundColor: 'white', boxShadow:'0px 4px 6px rgba(0, 0, 0, 0.0)'}}}>
+                    Edit
+                  </Button>
+                  <Button variant="contained" onClick={() => handleOpenRemove(item)} sx={{ borderRadius: '10px', backgroundColor: '#ff758c', padding: '3px 25px', border: '2px solid white', boxShadow:'0px 4px 6px rgba(0, 0, 0, 0.0)', textTransform: 'none', fontSize: '16px', fontFamily: 'Poppins', '&:hover': {backgroundColor: '#FFA1A8', boxShadow:'0px 4px 6px rgba(0, 0, 0, 0.0)'} }}>
+                    Delete
+                  </Button>
+                </Box>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+      </Box>
+    </>
+  );
 }
