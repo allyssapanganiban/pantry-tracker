@@ -4,9 +4,21 @@ import './globals.css'
 import Navbar from './Components/Navbar'
 import { Box, Stack, Typography, Button, Modal, TextField, InputAdornment } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
+import { styled } from '@mui/material/styles';
 import { firestore } from '@/firebase'
 import { collection, doc, getDocs, query, setDoc, deleteDoc, getDoc } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
+
+const CustomButton = styled(Button)(({ theme }) => ({
+  borderColor: '#FF939B',
+  fontFamily: 'Poppins',
+  // textTransform: 'none',
+  color: '#FF939B',
+  '&:hover': {
+    borderColor: '#FF939B',
+    backgroundColor: 'rgba(255, 147, 155, 0.1)',
+  },
+}));
 
 const style = {
   position: 'absolute',
@@ -123,11 +135,10 @@ export default function Home() {
         flexDirection={'column'}
         alignItems={'center'}
         gap={2}
-        bgcolor="linear-gradient(to right, #ff758c, #ff7eb3)"
       >
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
+            <Typography id="modal-modal-title" variant="h6" component="h2" fontFamily= 'Poppins'>
               Add Item
             </Typography>
             <Stack width="100%" direction={'column'} spacing={2}>
@@ -144,7 +155,7 @@ export default function Home() {
                   setItemQuantity(value < 0 ? 0 : value);
                 }}
               />
-              <Button
+              <CustomButton
                 variant="outlined"
                 onClick={() => {
                   addItem(itemName, itemQuantity);
@@ -154,13 +165,13 @@ export default function Home() {
                 }}
               >
                 Add
-              </Button>
+              </CustomButton>
             </Stack>
           </Box>
         </Modal>
         <Modal open={openEdit} onClose={handleCloseEdit} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
+            <Typography id="modal-modal-title" variant="h6" component="h2" fontFamily= 'Poppins'>
               Edit Item
             </Typography>
             <Stack width="100%" direction={'column'} spacing={2}>
@@ -177,7 +188,7 @@ export default function Home() {
                   setEditItemQuantity(value < 0 ? 0 : value);
                 }}
               />
-              <Button
+              <CustomButton
                 variant="outlined"
                 onClick={() => {
                   editItem(itemToEdit, editItemName, editItemQuantity);
@@ -187,29 +198,29 @@ export default function Home() {
                 }}
               >
                 Save
-              </Button>
+              </CustomButton>
             </Stack>
           </Box>
         </Modal>
         <Modal open={openRemove} onClose={handleCloseRemove} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
+            <Typography id="modal-modal-title" variant="h6" component="h2" fontFamily= 'Poppins'>
               Confirm Remove
             </Typography>
-            <Typography id="modal-modal-description">Are you sure you want to remove this item?</Typography>
+            <Typography id="modal-modal-description" fontFamily= 'Poppins' fontSize='15px'>Are you sure you want to remove this item?</Typography>
             <Stack width="100%" direction={'row'} spacing={2} justifyContent={'flex-end'}>
-              <Button variant="outlined" onClick={() => removeItem(itemToRemove.name)}>
-                Yes
-              </Button>
-              <Button variant="outlined" onClick={handleCloseRemove}>
-                No
-              </Button>
+            <CustomButton variant="outlined" onClick={() => removeItem(itemToRemove.name)}>
+              Yes
+            </CustomButton>
+            <CustomButton variant="outlined" onClick={handleCloseRemove}>
+              No
+            </CustomButton>
             </Stack>
           </Box>
         </Modal>
         <Box width="800px" height="50px" display={'flex'} justifyContent={'center'} alignItems={'center'} paddingTop={12} paddingBottom={5}>
           <Typography variant={'h3'} color={'#fff'} textAlign={'center'}>
-          <span style={{ fontWeight: 'bold' }}>Name's</span> Your<span style={{ fontWeight: 'bold' }}>Pantry</span>
+          <span style={{ fontWeight: 'bold' }}>Welcome to</span> Your<span style={{ fontWeight: 'bold' }}>Pantry!</span>
           </Typography>
         </Box>
         <Box display={'flex'} alignItems={'center'} gap={1} width="800px" mb={3}>

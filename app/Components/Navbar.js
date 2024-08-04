@@ -9,9 +9,9 @@ const Navbar = () => {
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             Your<span style={{ fontWeight: 'bold' }}>Pantry</span>
           </Typography>
-          <Button variant="outlined" color="inherit" sx={{ borderRadius: '50px', padding: '6px 25px', textTransform: 'none', fontSize: '17px', border: '2px solid #0D0C0A', fontFamily: 'Poppins'}}>
+          {/* <Button variant="outlined" color="inherit" sx={{ borderRadius: '50px', padding: '6px 25px', textTransform: 'none', fontSize: '17px', border: '2px solid #0D0C0A', fontFamily: 'Poppins'}}>
             Login
-          </Button>
+          </Button> */}
         </Toolbar>
       </AppBar>
     );
